@@ -34,6 +34,7 @@ jobs:
         ls
         ls -l wlroot
         cd wlroot
+        ls
 
     - name: Setup and build with Meson/Ninja
       
@@ -52,4 +53,4 @@ jobs:
       with:
         name: wlroots-binaries
         path: |
-          XWlroot/wlroots/build/
+          wlroot/build/
