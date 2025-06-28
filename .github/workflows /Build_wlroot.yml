@@ -1,0 +1,49 @@
+name: Build wlroots with termux-display-client
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [wlroots-display-client]
+  pull_request:
+    branches: [wlroots-display-client]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        repository: xodiosx/XWlroot
+        ref: wlroots-display-client
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y \
+          meson ninja-build clang pkg-config \
+          libwayland-dev wayland-protocols \
+          libdrm-dev libegl1-mesa-dev libgles2-mesa-dev \
+          libgbm-dev libxkbcommon-dev libpixman-1-dev
+
+    - name: Configure build
+      run: |
+        cd wlroots
+        meson setup build \
+          --buildtype=release \
+          -Drenderer=termwdc \
+          -Dbackends=termuxdc \
+          -Dwerror=false
+
+    - name: Compile project
+      run: |
+        cd wlroots
+        ninja -C build || true  # don't fail to preserve logs
+
+    - name: Upload build logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: wlroots-meson-logs
+        path: wlroots/build/meson-logs/
