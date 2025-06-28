@@ -60,11 +60,23 @@ jobs:
       run: |
           cd termux-display-clientx
           mkdir build && cd build
+          # Get NDK paths
+          NDK_PATH=$ANDROID_NDK_HOME
+          TOOLCHAIN=$NDK_PATH/toolchains/llvm/prebuilt/linux-x86_64
+          SYSROOT=$TOOLCHAIN/sysroot
+        
+          # Configure with explicit Android includes
           cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=$HOME/tdc-install
+          -DCMAKE_INSTALL_PREFIX=$HOME/tdc-install \
+          -DCMAKE_C_COMPILER=$TOOLCHAIN/bin/aarch64-linux-android24-clang \
+          -DCMAKE_CXX_COMPILER=$TOOLCHAIN/bin/aarch64-linux-android24-clang++ \
+          -DCMAKE_CXX_FLAGS="-I$SYSROOT/usr/include -I$NDK_PATH/sources/android/native_app_glue" \
+          -DCMAKE_EXE_LINKER_FLAGS="-pie"       
           make -j$(nproc)
           make install
+
+
     - name: Create pkg-config file for termux-display-clientx
       run: |
         mkdir -p $HOME/tdc-install/lib/pkgconfig
