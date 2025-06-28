@@ -2,6 +2,10 @@ name: Build Termux packages (wlroots + display client)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [wlroots-display-client]
+  pull_request:
+    branches: [wlroots-display-client]
 
 jobs:
   build:
@@ -67,12 +71,12 @@ jobs:
          TERMUX_PKG_SRCURL="."
          TERMUX_PKG_BUILD_IN_SRC=true
 
-         termux_step_make() {
-              mkdir -p build
-              cd build
-              cmake .. -DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX -DCMAKE_BUILD_TYPE=Release
-              make -j$(nproc)
-                             }
+        termux_step_make() {
+          mkdir -p build
+         cd build
+         cmake .. -DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX -DCMAKE_BUILD_TYPE=Release
+         make -j$(nproc)
+                           }
 
           termux_step_make_install() {
            cd build
