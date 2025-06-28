@@ -24,9 +24,9 @@ jobs:
       run: |
         sudo apt update
         sudo apt install meson -y
+        meson wrap update --force        
+        meson wrap install wayland 
         meson wrap update
-        meson wrap search wayland
-        meson wrap install wayland -y
         sudo apt install -y \
           ninja-build \
           clang pkg-config \
