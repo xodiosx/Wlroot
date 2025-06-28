@@ -59,26 +59,26 @@ jobs:
     - name: Create build.sh for termux-display-clientx
       run: |
         cat > termux-packages/packages/termux-display-clientx/build.sh << 'EOF'
-TERMUX_PKG_HOMEPAGE="https://github.com/xodiosx/termux-display-clientx"
-TERMUX_PKG_DESCRIPTION="Display client for rendering X/Wayland in Termux"
-TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@xodiosx"
-TERMUX_PKG_VERSION=1.0.0
-TERMUX_PKG_SRCURL="."
-TERMUX_PKG_BUILD_IN_SRC=true
+         TERMUX_PKG_HOMEPAGE="https://github.com/xodiosx/termux-display-clientx"
+         TERMUX_PKG_DESCRIPTION="Display client for rendering X/Wayland in Termux"
+         TERMUX_PKG_LICENSE="MIT"
+         TERMUX_PKG_MAINTAINER="@xodiosx"
+         TERMUX_PKG_VERSION=1.0.0
+         TERMUX_PKG_SRCURL="."
+         TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_make() {
-  mkdir -p build
-  cd build
-  cmake .. -DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX -DCMAKE_BUILD_TYPE=Release
-  make -j$(nproc)
-}
+         termux_step_make() {
+              mkdir -p build
+              cd build
+              cmake .. -DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX -DCMAKE_BUILD_TYPE=Release
+              make -j$(nproc)
+                             }
 
-termux_step_make_install() {
-  cd build
-  make install
-}
-EOF
+          termux_step_make_install() {
+           cd build
+           make install
+              }
+           EOF
 
     - name: Build in termux docker
       run: |
