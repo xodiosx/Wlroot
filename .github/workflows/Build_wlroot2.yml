@@ -89,14 +89,22 @@ jobs:
     - name: Configure build
       run: |
        export PKG_CONFIG_PATH=$HOME/tdc-install/lib/pkgconfig:$PKG_CONFIG_PATH
-        
-        ls        
+          if [ ! -f "$HOME/tdc-install/lib/libtermux-display-client.so" ]; then
+         echo "Library not found! Contents of tdc-install:"
+         ls -R $HOME/tdc-install
+         exit 1
+         fi
+         ls        
     
         meson setup build \
           --buildtype release \
           -Drenderers=auto \
           -Dbackends=termuxdc \
-          -Dwerror=false 
+          -Dwerror=false \
+          -Dc_args="-I$HOME/tdc-install/include" \
+          -Dc_link_args="-L$HOME/tdc-install/lib -ltermux-display-client" \
+          --pkg-config-path=$HOME/tdc-install/lib/pkgconfig
+          
           
 
         ninja -C build
