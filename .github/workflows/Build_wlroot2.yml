@@ -95,13 +95,15 @@ jobs:
          exit 1
          fi
          ls        
-    
+        gcc --version
+        g++ --version
         meson setup build \
           --buildtype release \
           -Drenderers=auto \
           -Dbackends=termuxdc \
           -Dwerror=false \
           -Dc_args="-I$HOME/tdc-install/include" \
+          --native-file <(echo "[binaries]c = 'gcc' cpp = 'g++'") \
           -Dc_link_args="-L$HOME/tdc-install/lib -ltermux-display-client" \
           --pkg-config-path=$HOME/tdc-install/lib/pkgconfig
           
