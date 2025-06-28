@@ -31,8 +31,9 @@ jobs:
     - name: Clone XWlroot repo (wlroots-display-client branch)
       run: |
         git clone https://github.com/xodiosx/XWlroot.git --branch wlroots-display-client --depth=1
-        ls -l wlroots-display-client
-        cd wlroots-display-client
+        ls
+        ls -l XWlroot
+        cd XWlroot
 
     - name: Setup and build with Meson/Ninja
       
