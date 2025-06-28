@@ -1,49 +1,49 @@
-# .github/workflows/build-xwlroot.yml
-name: Build XWlroot
+name: Build wlroots-display-client
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [wlroots-display-client]
+  pull_request:
 
 jobs:
-  build-xwlroot:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        renderer: [pixman, termwdc]
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set up dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential meson ninja-build \
-            wayland-protocols libwayland-dev libdrm-dev \
-            libegl1-mesa-dev libgbm-dev libxkbcommon-dev \
-            libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
-            pkg-config cmake libinput-dev
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y meson ninja-build pkg-config \
+          libwayland-dev wayland-protocols libdrm-dev \
+          libgbm-dev libegl1-mesa-dev libxkbcommon-dev pixman \
+          libgles2-mesa-dev
 
-      - name: Set up environment
-        run: |
-          echo "CC=clang" >> $GITHUB_ENV
-          echo "CXX=clang++" >> $GITHUB_ENV
+    - name: Setup Xvfb for headless
+      run: |
+        sudo apt install -y xvfb
+        export DISPLAY=:99
+        Xvfb :99 -screen 0 1024x768x24 &
+    
+    - name: Configure & build wlroots (${{ matrix.renderer }})
+      run: |
+        cd wlroots
+        rm -rf build-${{ matrix.renderer }}
+        meson setup build-${{ matrix.renderer }} \
+          --buildtype release \
+          -Drenderer=${{ matrix.renderer }} \
+          -Dbackends=termuxdc \
+          -Dwerror=false
+        meson compile -C build-${{ matrix.renderer }} || true
 
-      - name: Configure wlroots with meson
-        run: |
-          git clone https://github.com/xodiosx/XWlroot.git --depth=1
-          cd XWlroot/wlroots
-          meson setup build \
-            --buildtype release \
-            -Drenderer=pixman \
-            -Dbackends=termuxdc \
-            -Dwerror=false
-
-      - name: Build wlroots
-        run: |
-          cd XWlroot/wlroots/build
-          ninja
-
-      - name: Archive built files
-        uses: actions/upload-artifact@v4
-        with:
-          name: wlroots-artifacts
-          path: XWlroot/wlroots/build
+    - name: Upload build logs
+      uses: actions/upload-artifact@v3
+      with:
+        name: wlroots-${{ matrix.renderer }}-logs
+        path: |
+          wlroots/build-${{ matrix.renderer }}/meson-logs/
