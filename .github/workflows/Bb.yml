@@ -30,31 +30,31 @@ jobs:
     - name: Create build.sh for wlroots
       run: |
         cat > termux-packages/packages/wlroots-display/build.sh << 'EOF'
-TERMUX_PKG_HOMEPAGE="https://github.com/xodiosx/wlroots"
-TERMUX_PKG_DESCRIPTION="Termux compatible wlroots fork with termuxdc backend"
-TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@xodiosx"
-TERMUX_PKG_VERSION=0.18.2
-TERMUX_PKG_SRCURL="."
-TERMUX_PKG_DEPENDS="libwayland, libxkbcommon, libpixman"
-TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dbackends=termuxdc -Drenderers=pixman -Dwerror=false"
+        TERMUX_PKG_HOMEPAGE="https://github.com/xodiosx/wlroots"
+        TERMUX_PKG_DESCRIPTION="Termux compatible wlroots fork with termuxdc backend"
+        TERMUX_PKG_LICENSE="MIT"
+        TERMUX_PKG_MAINTAINER="@xodiosx"
+        TERMUX_PKG_VERSION=0.18.2
+        TERMUX_PKG_SRCURL="."
+        TERMUX_PKG_DEPENDS="libwayland, libxkbcommon, libpixman"
+        TERMUX_PKG_BUILD_IN_SRC=true
+        TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dbackends=termuxdc -Drenderers=pixman -Dwerror=false"
 
-termux_step_configure() {
-  meson setup build \
-    --prefix=$TERMUX_PREFIX \
-    --buildtype=release \
-    $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
-}
+        termux_step_configure() {
+        meson setup build \
+        --prefix=$TERMUX_PREFIX \
+        --buildtype=release \
+        $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+        }
 
-termux_step_make() {
-  ninja -C build
-}
+        termux_step_make() {
+        ninja -C build
+        }
 
-termux_step_make_install() {
-  ninja -C build install
-}
-EOF
+        termux_step_make_install() {
+        ninja -C build install
+        }
+         EOF
 
     - name: Create build.sh for termux-display-clientx
       run: |
