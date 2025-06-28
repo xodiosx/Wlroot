@@ -1,14 +1,14 @@
 project(
-	'wlroots',
-	'c',
-	version: '0.18.2',
-	license: 'MIT',
-	meson_version: '>=0.59.0',
-	default_options: [
-		'c_std=c17'),
-		'warning_level=2',
-		'werror=true',
-	],
+  'wlroots',
+  'c',
+  version: '0.18.2',
+  license: 'MIT',
+  meson_version: '>=0.59.0',
+  default_options: [
+    'c_std=c17',
+    'warning_level=2',
+    'werror=true',
+  ],
 )
 
 version = meson.project_version().split('-')[0]
