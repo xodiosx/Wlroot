@@ -15,14 +15,16 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
       with:
-        repository: xodiosx/wlroot
+        repository: xodiosx/wlroots
         ref: wlroots-display-client
         submodules: recursive
+        ls
 
     
 
     - name: Configure build
       run: |
+        ls
         cd wlroots
         sudo apt update
          sudo apt install -y \
