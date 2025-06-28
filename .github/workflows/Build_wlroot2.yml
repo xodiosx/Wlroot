@@ -45,7 +45,7 @@ jobs:
         ls
         meson setup build \
           --buildtype release \
-          -Drenderer=pixman \
+          -Drenderers=pixman \
           -Dbackends=termuxdc \
           -Dwerror=false
 
