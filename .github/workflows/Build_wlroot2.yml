@@ -24,8 +24,8 @@ jobs:
       run: |
         sudo apt update
         sudo apt install meson -y
-                
-        
+        curl -L https://wrapdb.mesonbuild.com/v2/wayland-protocols_1.35/get_wrap -o subprojects/wayland-protocols.wrap       
+        meson wrap update --force
         
         sudo apt install -y \
           ninja-build \
