@@ -45,19 +45,19 @@ jobs:
         export CXX=$TOOLCHAIN/bin/aarch64-linux-android26-clang++
 
         meson setup build \
-          --cross-file <(cat <<EOF
+         --cross-file <(cat <<EOF
         [binaries]
          c = '$CC'
          cpp = '$CXX'
          ar = '$AR'
          pkgconfig = 'pkg-config'
 
-       [host_machine]
+        [host_machine]
         system = 'android'
-       cpu_family = 'aarch64'
-       cpu = 'armv8-a'
-       endian = 'little'
-       EOF
+        cpu_family = 'aarch64'
+        cpu = 'armv8-a'
+        endian = 'little'
+        EOF
           ) \
           --buildtype release \
           -Dbackends=termuxdc \
