@@ -24,8 +24,8 @@ jobs:
       run: |
         sudo apt update
         sudo apt install meson -y
-        meson wrap update --force        
-        meson wrap install wayland 
+                
+        
         
         sudo apt install -y \
           ninja-build \
