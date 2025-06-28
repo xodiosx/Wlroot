@@ -2,11 +2,7 @@ name: Build wlroots2
 
 on:
   workflow_dispatch:
-  push:
-    branches: [wlroots-display-client]
-  pull_request:
-    branches: [wlroots-display-client]
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -47,7 +43,8 @@ jobs:
           --buildtype release \
           -Drenderers=auto \
           -Dbackends=termuxdc \
-          -Dwerror=false
+          -Dwerror=false \
+          --wrap-mode=forcefallback
 
         ninja -C build
 
