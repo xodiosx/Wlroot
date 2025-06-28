@@ -23,6 +23,10 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
+        meson wrap update
+        meson wrap search wayland
+        meson wrap install wayland
+        
         sudo apt install -y \
           meson ninja-build \
           clang pkg-config \
@@ -44,8 +48,7 @@ jobs:
     - name: Configure build
       run: |
         ls
-        meson wrap install 'wayland@1.23.0'
-        meson wrap update
+        
         meson setup build \
           --buildtype release \
           -Drenderers=auto \
