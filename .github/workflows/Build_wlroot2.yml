@@ -19,7 +19,12 @@ jobs:
         repository: xodiosx/wlroots
         ref: wlroots-display-client
         submodules: recursive
-               
+    - name: Checkout termux-display-client repo
+      uses: actions/checkout@v4
+      with:
+        repository: xodiosx/termux-display-clientx
+        path: termux-display-clientx   
+       
     - name: Install dependencies
       run: |
         sudo apt update
@@ -43,11 +48,34 @@ jobs:
           libxcb-shm0-dev \
           libxcb-xfixes0-dev
 
+    - name: Build termux-display-client
+      run: |
+        cd termux-display-clientx
+        meson setup build \
+          --buildtype release \
+          --prefix=$HOME/tdc-install
+        ninja -C build
+        ninja -C build install
 
     - name: Configure build
       run: |
         ls
+        mkdir -p $HOME/tdc-install/lib/pkgconfig
+        cat > $HOME/tdc-install/lib/pkgconfig/termux-display-client.pc <<EOF
+        prefix=$HOME/tdc-install
+        exec_prefix=\${prefix}
+        libdir=\${prefix}/lib
+        includedir=\${prefix}/include
         
+        Name: termux-display-client
+        Description: Termux display client library
+        Version: 0.1
+        Libs: -L\${libdir} -ltermux-display-client
+        Cflags: -I\${includedir}
+        EOF
+        
+        export PKG_CONFIG_PATH=$HOME/tdc-install/lib/pkgconfig:$PKG_CONFIG_PATH
+    
         meson setup build \
           --buildtype release \
           -Drenderers=auto \
