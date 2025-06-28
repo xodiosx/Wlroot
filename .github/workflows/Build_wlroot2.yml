@@ -43,7 +43,7 @@ jobs:
     - name: Configure build
       run: |
         ls
-        meson wrap install wayland --version 1.23.0
+        meson wrap install wayland@1.23.0
         meson wrap update
         meson setup build \
           --buildtype release \
