@@ -94,7 +94,10 @@ jobs:
          ls -R $HOME/tdc-install
          exit 1
          fi
-         ls        
+         ls 
+        unset ANDROID_NDK_HOME
+        unset ANDROID_NDK_ROOT
+        unset NDK_PATH
         gcc --version
         g++ --version
         meson setup build \
