@@ -1,4 +1,4 @@
-name: Build wlroots2
+name: Build wlroot2
 
 on:
   workflow_dispatch:
@@ -6,118 +6,72 @@ on:
     branches: [wlroots-display-client]
   pull_request:
     branches: [wlroots-display-client]
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
-
     steps:
-    - name: Checkout repo
+    - name: Checkout wlroots repo
       uses: actions/checkout@v4
       with:
         repository: xodiosx/wlroots
         ref: wlroots-display-client
         submodules: recursive
-    - name: Checkout termux-display-client repo
-      uses: actions/checkout@v4
-      with:
-        repository: xodiosx/termux-display-clientx
-        path: termux-display-clientx   
-       
+
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install meson -y
-        
-        
         sudo apt install -y \
-          ninja-build \
-          clang pkg-config \
-          libpixman-1-dev \
-          libwayland-dev \
+          meson ninja-build \
+          pkg-config \
           wayland-protocols \
-          libegl1-mesa-dev \
-          libdrm-dev \
-          libxkbcommon-dev \
-          libgbm-dev \
-          libudev-dev \
-          libinput-dev \
-          libxcb1-dev \
-          libxcb-render0-dev \
-          libxcb-shm0-dev \
-          libxcb-xfixes0-dev
+          libpixman-1-dev \
+          zip
 
     - name: Install Android NDK
       run: |
-        # Download and install Android NDK
         wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
         unzip android-ndk-r27c-linux.zip -d $HOME
-        echo "ANDROID_NDK_HOME=$HOME/android-ndk-r27c" >> $GITHUB_ENV
-        echo "PATH=$HOME/android-ndk-r27c:$PATH" >> $GITHUB_ENV  
-        
-    - name: Build termux-display-clientx with CMake
-      run: |
-          cd termux-display-clientx
-          mkdir build && cd build
-          # Get NDK paths
-          NDK_PATH=$ANDROID_NDK_HOME
-          TOOLCHAIN=$NDK_PATH/toolchains/llvm/prebuilt/linux-x86_64
-          SYSROOT=$TOOLCHAIN/sysroot
-        
-          # Configure with explicit Android includes
-          cmake .. \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=$HOME/tdc-install \
-          -DCMAKE_C_COMPILER=$TOOLCHAIN/bin/aarch64-linux-android26-clang \
-          -DCMAKE_CXX_COMPILER=$TOOLCHAIN/bin/aarch64-linux-android26-clang++ \
-          -DCMAKE_CXX_FLAGS="-I$SYSROOT/usr/include -I$NDK_PATH/sources/android/native_app_glue" \
-          -DCMAKE_EXE_LINKER_FLAGS="-pie"       
-          make -j$(nproc)
-          make install
+        echo "ANDROID_NDK=$HOME/android-ndk-r27c" >> $GITHUB_ENV
+        echo "PATH=$HOME/android-ndk-r27c:$PATH" >> $GITHUB_ENV
 
-
-    - name: Create pkg-config file for termux-display-clientx
+    - name: Configure and build with Meson
       run: |
-        mkdir -p $HOME/tdc-install/lib/pkgconfig
-        cat > $HOME/tdc-install/lib/pkgconfig/termux-display-client.pc <<EOF
-        prefix=$HOME/tdc-install
-        exec_prefix=\${prefix}
-        libdir=\${prefix}/lib
-        includedir=\${prefix}/include
+        export NDK=$HOME/android-ndk-r27c
+        export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
+        export AR=$TOOLCHAIN/bin/llvm-ar
+        export CC=$TOOLCHAIN/bin/aarch64-linux-android26-clang
+        export CXX=$TOOLCHAIN/bin/aarch64-linux-android26-clang++
 
-    - name: Configure build
-      run: |
-       export PKG_CONFIG_PATH=$HOME/tdc-install/lib/pkgconfig:$PKG_CONFIG_PATH
-          if [ ! -f "$HOME/tdc-install/lib/libtermux-display-client.so" ]; then
-         echo "Library not found! Contents of tdc-install:"
-         ls -R $HOME/tdc-install
-         exit 1
-         fi
-         ls 
-        unset ANDROID_NDK_HOME
-        unset ANDROID_NDK_ROOT
-        unset NDK_PATH
-        gcc --version
-        g++ --version
         meson setup build \
+          --cross-file <(cat <<EOF
+[binaries]
+c = '$CC'
+cpp = '$CXX'
+ar = '$AR'
+pkgconfig = 'pkg-config'
+
+[host_machine]
+system = 'android'
+cpu_family = 'aarch64'
+cpu = 'armv8-a'
+endian = 'little'
+EOF
+          ) \
           --buildtype release \
-          -Drenderers=auto \
           -Dbackends=termuxdc \
-          -Dwerror=false \
-          -Dc_args="-I$HOME/tdc-install/include" \
-          --native-file <(echo "[binaries]c = 'gcc' cpp = 'g++'") \
-          -Dc_link_args="-L$HOME/tdc-install/lib -ltermux-display-client" \
-          --pkg-config-path=$HOME/tdc-install/lib/pkgconfig
-          
-          
+          -Drenderers=auto \
+          -Dwerror=false
 
         ninja -C build
 
-    - name: Archive build output
-      if: success()
+    - name: Zip build output
+      run: |
+        zip -r wlroots-arm64-build.zip build/
+
+    - name: Upload zip artifact
       uses: actions/upload-artifact@v4
       with:
-        name: wlroots-binaries
-        path: |
-          wlroot/build/
+        name: wlroots-arm64
+        path: wlroots-arm64-build.zip
