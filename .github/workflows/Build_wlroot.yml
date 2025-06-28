@@ -33,7 +33,7 @@ jobs:
         git clone https://github.com/xodiosx/wlroot.git --branch wlroots-display-client --depth=1
         ls
         ls -l wlroot
-        cd wlroot
+        ls wlroot
         ls
 
     - name: Setup and build with Meson/Ninja
