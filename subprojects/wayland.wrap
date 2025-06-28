@@ -1,4 +1,4 @@
 [wrap-git]
 directory = wayland
 url = https://gitlab.freedesktop.org/wayland/wayland.git
-revision = 1.23.0￼Enter
+revision = 1.23.0
