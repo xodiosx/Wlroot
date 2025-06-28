@@ -23,7 +23,7 @@ jobs:
     - name: Configure build
       run: |
         ls
-        cd wlroots
+        ls 
         sudo apt update
          sudo apt install -y \
           meson ninja-build clang pkg-config \
