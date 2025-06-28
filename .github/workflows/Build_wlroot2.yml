@@ -69,8 +69,8 @@ jobs:
           cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_INSTALL_PREFIX=$HOME/tdc-install \
-          -DCMAKE_C_COMPILER=$TOOLCHAIN/bin/aarch64-linux-android24-clang \
-          -DCMAKE_CXX_COMPILER=$TOOLCHAIN/bin/aarch64-linux-android24-clang++ \
+          -DCMAKE_C_COMPILER=$TOOLCHAIN/bin/aarch64-linux-android26-clang \
+          -DCMAKE_CXX_COMPILER=$TOOLCHAIN/bin/aarch64-linux-android26-clang++ \
           -DCMAKE_CXX_FLAGS="-I$SYSROOT/usr/include -I$NDK_PATH/sources/android/native_app_glue" \
           -DCMAKE_EXE_LINKER_FLAGS="-pie"       
           make -j$(nproc)
