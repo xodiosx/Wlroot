@@ -1,4 +1,4 @@
-name: Build wlroots2
+pname: Build wlroots2
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
         repository: xodiosx/wlroots
         ref: wlroots-display-client
         submodules: recursive
-        ls
+        
 
     
 
