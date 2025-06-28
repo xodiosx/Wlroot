@@ -18,7 +18,27 @@ jobs:
         repository: xodiosx/wlroots
         ref: wlroots-display-client
         submodules: recursive
-            
+               
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y \
+          meson ninja-build \
+          clang pkg-config \
+          libpixman-1-dev \
+          libwayland-dev \
+          wayland-protocols \
+          libegl1-mesa-dev \
+          libdrm-dev \
+          libxkbcommon-dev \
+          libgbm-dev \
+          libudev-dev \
+          libinput-dev \
+          libxcb1-dev \
+          libxcb-render0-dev \
+          libxcb-shm0-dev \
+          libxcb-xfixes0-dev
+
 
     - name: Configure build
       run: |
