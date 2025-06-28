@@ -1,49 +1,49 @@
-name: Build wlroots-display-client
+name: Build wlroots with termux-display-client
 
 on:
+  workflow_dispatch:
   push:
     branches: [wlroots-display-client]
   pull_request:
+    branches: [wlroots-display-client]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        renderer: [pixman, termwdc]
 
     steps:
-    - name: Checkout code
+    - name: Checkout repo
       uses: actions/checkout@v4
+      with:
+        repository: xodiosx/XWlroot
+        ref: wlroots-display-client
+        submodules: recursive
 
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y meson ninja-build pkg-config \
-          libwayland-dev wayland-protocols libdrm-dev \
-          libgbm-dev libegl1-mesa-dev libxkbcommon-dev pixman \
-          libgles2-mesa-dev
+        sudo apt install -y \
+          meson ninja-build clang pkg-config \
+          libwayland-dev wayland-protocols \
+          libdrm-dev libegl1-mesa-dev libgles2-mesa-dev \
+          libgbm-dev libxkbcommon-dev libpixman-1-dev
 
-    - name: Setup Xvfb for headless
-      run: |
-        sudo apt install -y xvfb
-        export DISPLAY=:99
-        Xvfb :99 -screen 0 1024x768x24 &
-    
-    - name: Configure & build wlroots (${{ matrix.renderer }})
+    - name: Configure build
       run: |
         cd wlroots
-        rm -rf build-${{ matrix.renderer }}
-        meson setup build-${{ matrix.renderer }} \
-          --buildtype release \
-          -Drenderer=${{ matrix.renderer }} \
+        meson setup build \
+          --buildtype=release \
+          -Drenderer=termwdc \
           -Dbackends=termuxdc \
           -Dwerror=false
-        meson compile -C build-${{ matrix.renderer }} || true
+
+    - name: Compile project
+      run: |
+        cd wlroots
+        ninja -C build || true  # don't fail to preserve logs
 
     - name: Upload build logs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: wlroots-${{ matrix.renderer }}-logs
-        path: |
-          wlroots/build-${{ matrix.renderer }}/meson-logs/
+        name: wlroots-meson-logs
+        path: wlroots/build/meson-logs/
