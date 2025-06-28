@@ -15,7 +15,7 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
       with:
-        repository: xodiosx/XWlroot
+        repository: xodiosx/Wlroot
         ref: wlroots-display-client
         submodules: recursive
 
