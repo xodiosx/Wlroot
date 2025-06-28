@@ -1,4 +1,4 @@
-name: Build wlroots + termux-display-clientx (Termux DEBs)
+name: Build Termux packages (wlroots + display client)
 
 on:
   workflow_dispatch:
@@ -8,66 +8,70 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y git tar xz-utils python3
-
-    - name: Clone termux-packages
+    - name: Checkout termux-packages
       uses: actions/checkout@v4
       with:
         repository: termux/termux-packages
         path: termux-packages
 
-    - name: Clone wlroots and display client repos
+    - name: Clone source projects
       run: |
         git clone --depth=1 --branch wlroots-display-client https://github.com/xodiosx/wlroots.git
         git clone --depth=1 https://github.com/xodiosx/termux-display-clientx.git
 
-    - name: Archive source directories into .tar.xz
-      run: |
-        tar -cJf wlroots.tar.xz wlroots
-        tar -cJf termux-display-clientx.tar.xz termux-display-clientx
-
-    - name: Prepare termux-packages folders
+    - name: Move source into termux-packages/packages
       run: |
         mkdir -p termux-packages/packages/wlroots-display
         mkdir -p termux-packages/packages/termux-display-clientx
 
-        mv wlroots.tar.xz termux-packages/packages/wlroots-display/
-        mv termux-display-clientx.tar.xz termux-packages/packages/termux-display-clientx/
+        cp -r wlroots/* termux-packages/packages/wlroots-display/
+        cp -r termux-display-clientx/* termux-packages/packages/termux-display-clientx/
 
-    - name: Create wlroots build.sh
+    - name: Create build.sh for wlroots
       run: |
-        cat << 'EOF' > termux-packages/packages/wlroots-display/build.sh
+        cat > termux-packages/packages/wlroots-display/build.sh << 'EOF'
 TERMUX_PKG_HOMEPAGE="https://github.com/xodiosx/wlroots"
 TERMUX_PKG_DESCRIPTION="Termux-compatible wlroots fork with termuxdc backend"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@xodiosx"
 TERMUX_PKG_VERSION=0.18.2
-TERMUX_PKG_SRCURL=file://\${TERMUX_PKG_BUILDER_DIR}/wlroots.tar.xz
+TERMUX_PKG_SRCURL="."
 TERMUX_PKG_DEPENDS="libwayland, libxkbcommon, libpixman"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dbackends=termuxdc -Drenderers=pixman -Dwerror=false"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dbackends=termuxdc -Drenderers=pixman -Dwerror=false"
+
+termux_step_configure() {
+  meson setup build \
+    --prefix=$TERMUX_PREFIX \
+    --buildtype=release \
+    $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+}
+
+termux_step_make() {
+  ninja -C build
+}
+
+termux_step_make_install() {
+  ninja -C build install
+}
 EOF
 
-    - name: Create termux-display-clientx build.sh
+    - name: Create build.sh for termux-display-clientx
       run: |
-        cat << 'EOF' > termux-packages/packages/termux-display-clientx/build.sh
+        cat > termux-packages/packages/termux-display-clientx/build.sh << 'EOF'
 TERMUX_PKG_HOMEPAGE="https://github.com/xodiosx/termux-display-clientx"
 TERMUX_PKG_DESCRIPTION="Display client for rendering X/Wayland in Termux"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@xodiosx"
 TERMUX_PKG_VERSION=1.0.0
-TERMUX_PKG_SRCURL=file://\${TERMUX_PKG_BUILDER_DIR}/termux-display-clientx.tar.xz
-TERMUX_PKG_DEPENDS=""
+TERMUX_PKG_SRCURL="."
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
   mkdir -p build
   cd build
-  cmake .. -DCMAKE_INSTALL_PREFIX=\$TERMUX_PREFIX -DCMAKE_BUILD_TYPE=Release
-  make -j\$(nproc)
+  cmake .. -DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX -DCMAKE_BUILD_TYPE=Release
+  make -j$(nproc)
 }
 
 termux_step_make_install() {
@@ -76,14 +80,14 @@ termux_step_make_install() {
 }
 EOF
 
-    - name: Build DEBs in termux-packages container
+    - name: Build in termux docker
       run: |
         docker run --rm -v $PWD/termux-packages:/home/builder \
           -e PACKAGES="termux-display-clientx wlroots-display" \
           ghcr.io/termux/package-builder:latest
 
-    - name: Upload DEB artifacts
+    - name: Upload DEBs
       uses: actions/upload-artifact@v4
       with:
-        name: deb-packages
+        name: termux-debs
         path: termux-packages/output/*.deb
