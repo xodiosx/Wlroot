@@ -28,12 +28,12 @@ jobs:
           libxcb-shm0-dev \
           libxcb-xfixes0-dev
 
-    - name: Clone XWlroot repo (wlroots-display-client branch)
+    - name: Clone wlroot repo (wlroots-display-client branch)
       run: |
-        git clone https://github.com/xodiosx/XWlroot.git --branch wlroots-display-client --depth=1
+        git clone https://github.com/xodiosx/wlroot.git --branch wlroots-display-client --depth=1
         ls
-        ls -l XWlroot
-        cd XWlroot
+        ls -l wlroot
+        cd wlroot
 
     - name: Setup and build with Meson/Ninja
       
