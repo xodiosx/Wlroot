@@ -23,10 +23,10 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        apt install meson
+        apt install meson -y
         meson wrap update
         meson wrap search wayland
-        meson wrap install wayland
+        meson wrap install wayland -y
         sudo apt install -y \
           ninja-build \
           clang pkg-config \
