@@ -23,27 +23,18 @@ jobs:
     - name: Configure build
       run: |
         ls
-        ls 
-        sudo apt update
-         sudo apt install -y \
-          meson ninja-build clang pkg-config \
-          libwayland-dev wayland-protocols \
-          libdrm-dev libegl1-mesa-dev libgles2-mesa-dev \
-          libgbm-dev libxkbcommon-dev libpixman-1-dev
-          meson setup build \
-          --buildtype=release \
-          -Drenderer=termwdc \
+        meson setup build \
+          --buildtype release \
+          -Drenderer=pixman \
           -Dbackends=termuxdc \
           -Dwerror=false
 
-    - name: Compile project
-      run: |
-        ls -a
-        cd wlroot
-        ninja -C build || true  # don't fail to preserve logs
+        ninja -C build
 
-    - name: Upload build logs
+    - name: Archive build output
+      if: success()
       uses: actions/upload-artifact@v4
       with:
-        name: wlroots-meson-logs
-        path: wlroots/build/meson-logs/
+        name: wlroots-binaries
+        path: |
+          wlroot/build/
