@@ -31,7 +31,7 @@ jobs:
       run: |
         cat > termux-packages/packages/wlroots-display/build.sh << 'EOF'
 TERMUX_PKG_HOMEPAGE="https://github.com/xodiosx/wlroots"
-TERMUX_PKG_DESCRIPTION="Termux-compatible wlroots fork with termuxdc backend"
+TERMUX_PKG_DESCRIPTION="Termux compatible wlroots fork with termuxdc backend"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@xodiosx"
 TERMUX_PKG_VERSION=0.18.2
