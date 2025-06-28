@@ -28,6 +28,17 @@ jobs:
           wayland-protocols \
           libpixman-1-dev \
           zip
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y \
+          meson ninja-build \
+          pkg-config \
+          wayland-protocols \
+          libpixman-1-dev \
+          wayland-scanner \
+          zip
+
 
     - name: Install Android NDK
       run: |
