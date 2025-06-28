@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        apt install meson -y
+        sudo apt install meson -y
         meson wrap update
         meson wrap search wayland
         meson wrap install wayland -y
