@@ -1,77 +1,49 @@
-name: Build XWlroot + Labwc with termuxdc
+# .github/workflows/build-xwlroot.yml
+name: Build XWlroot
 
 on:
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-xwlroot:
     runs-on: ubuntu-latest
 
-    env:
-      PREFIX: ${{ github.workspace }}/prefix
-      MESON: /usr/bin/meson
-      NINJA: /usr/bin/ninja
-      WLR_REPO: https://github.com/xodiosx/XWlroot.git
-      WLR_COMMIT: f9c224cfb7c56fc8db631475157caf9306c74467
-      LABWC_REPO: https://github.com/labwc/labwc.git
-
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: ⬇️ Checkout workflow
-      uses: actions/checkout@v3
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential meson ninja-build \
+            wayland-protocols libwayland-dev libdrm-dev \
+            libegl1-mesa-dev libgbm-dev libxkbcommon-dev \
+            libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
+            pkg-config cmake libinput-dev
 
-    - name: 🧰 Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y meson ninja-build build-essential \
-          libwayland-dev libpixman-1-dev libxkbcommon-dev \
-          libxcb1-dev libxcb-composite0-dev libxcb-xfixes0-dev \
-          libxcb-image0-dev libxcb-render-util0-dev \
-          libpam0g-dev libpam-wrapper libdrm-dev libegl1-mesa-dev \
-          libinput-dev libudev-dev libx11-dev libx11-xcb-dev \
-          libxcb-ewmh-dev libxcb-icccm4-dev libxcb-res0-dev \
-          libxcb-xinerama0-dev wayland-protocols \
-          libglib2.0-dev libxml2-dev pkg-config cmake git
+      - name: Set up environment
+        run: |
+          echo "CC=clang" >> $GITHUB_ENV
+          echo "CXX=clang++" >> $GITHUB_ENV
 
-    - name: 🌀 Clone wlroots fork with termuxdc backend
-      run: |
-        git clone --recursive $WLR_REPO wlroots
-        cd wlroots
-        git checkout $WLR_COMMIT
+      - name: Configure wlroots with meson
+        run: |
+          git clone https://github.com/xodiosx/XWlroot.git --depth=1
+          cd XWlroot/wlroots
+          meson setup build \
+            --buildtype release \
+            -Drenderer=pixman \
+            -Dbackends=termuxdc \
+            -Dwerror=false
 
-    - name: 🧱 Build wlroots
-      run: |
-        mkdir -p "$PREFIX"
-        cd wlroots
-        meson setup build \
-          -Dbackends=termuxdc \
-          -Drenderers=pixman \
-          --prefix=$PREFIX \
-          --buildtype=release
-        ninja -C build
-        ninja -C build install
+      - name: Build wlroots
+        run: |
+          cd XWlroot/wlroots/build
+          ninja
 
-    - name: 🔄 Clone labwc
-      run: |
-        git clone $LABWC_REPO labwc
-
-    - name: 🏗️ Build labwc with local wlroots
-      run: |
-        cd labwc
-        PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig" \
-        meson setup build \
-          --prefix=$PREFIX \
-          --buildtype=release
-        ninja -C build
-        ninja -C build install
-
-    - name: 📦 Package artifacts
-      run: |
-        mkdir output
-        cp -r $PREFIX/* output/
-
-    - name: 📤 Upload binaries
-      uses: actions/upload-artifact@v4
-      with:
-        name: termuxdc-labwc
-        path: output￼Enter
+      - name: Archive built files
+        uses: actions/upload-artifact@v4
+        with:
+          name: wlroots-artifacts
+          path: XWlroot/wlroots/build
