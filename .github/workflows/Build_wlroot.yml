@@ -1,49 +1,53 @@
-name: Build wlroots with termux-display-client
+name: Build XWlroot wlroots-display-client
 
 on:
   workflow_dispatch:
-  push:
-    branches: [wlroots-display-client]
-  pull_request:
-    branches: [wlroots-display-client]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
-      with:
-        repository: xodiosx/XWlroot
-        ref: wlroots-display-client
-        submodules: recursive
-
     - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y \
-          meson ninja-build clang pkg-config \
-          libwayland-dev wayland-protocols \
-          libdrm-dev libegl1-mesa-dev libgles2-mesa-dev \
-          libgbm-dev libxkbcommon-dev libpixman-1-dev
+          meson ninja-build \
+          clang pkg-config \
+          libpixman-1-dev \
+          libwayland-dev \
+          wayland-protocols \
+          libegl1-mesa-dev \
+          libdrm-dev \
+          libxkbcommon-dev \
+          libgbm-dev \
+          libudev-dev \
+          libinput-dev \
+          libxcb1-dev \
+          libxcb-render0-dev \
+          libxcb-shm0-dev \
+          libxcb-xfixes0-dev
 
-    - name: Configure build
+    - name: Clone XWlroot repo (wlroots-display-client branch)
       run: |
-        cd wlroots
+        git clone https://github.com/xodiosx/XWlroot.git --branch wlroots-display-client --depth=1
+        ls -l XWlroot
+
+    - name: Setup and build with Meson/Ninja
+      working-directory: XWlroot/wlroots
+      run: |
         meson setup build \
-          --buildtype=release \
-          -Drenderer=termwdc \
+          --buildtype release \
+          -Drenderer=pixman \
           -Dbackends=termuxdc \
           -Dwerror=false
 
-    - name: Compile project
-      run: |
-        cd wlroots
-        ninja -C build || true  # don't fail to preserve logs
+        ninja -C build
 
-    - name: Upload build logs
+    - name: Archive build output
+      if: success()
       uses: actions/upload-artifact@v4
       with:
-        name: wlroots-meson-logs
-        path: wlroots/build/meson-logs/
+        name: wlroots-binaries
+        path: |
+          XWlroot/wlroots/build/
