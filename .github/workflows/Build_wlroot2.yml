@@ -15,7 +15,7 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
       with:
-        repository: xodiosx/Wlroot
+        repository: xodiosx/wlroot
         ref: wlroots-display-client
         submodules: recursive
 
@@ -38,8 +38,8 @@ jobs:
 
     - name: Compile project
       run: |
-        ls
-        cd XWlroots
+        ls -a
+        cd wlroot
         ninja -C build || true  # don't fail to preserve logs
 
     - name: Upload build logs
