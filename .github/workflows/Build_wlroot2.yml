@@ -19,19 +19,18 @@ jobs:
         ref: wlroots-display-client
         submodules: recursive
 
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y \
-          meson ninja-build clang pkg-config \
-          libwayland-dev wayland-protocols \
-          libdrm-dev libegl1-mesa-dev libgles2-mesa-dev \
-          libgbm-dev libxkbcommon-dev libpixman-1-dev
+    
 
     - name: Configure build
       run: |
         cd wlroots
-        meson setup build \
+        sudo apt update
+         sudo apt install -y \
+          meson ninja-build clang pkg-config \
+          libwayland-dev wayland-protocols \
+          libdrm-dev libegl1-mesa-dev libgles2-mesa-dev \
+          libgbm-dev libxkbcommon-dev libpixman-1-dev
+          meson setup build \
           --buildtype=release \
           -Drenderer=termwdc \
           -Dbackends=termuxdc \
@@ -39,7 +38,8 @@ jobs:
 
     - name: Compile project
       run: |
-        cd wlroots
+        ls
+        cd XWlroots
         ninja -C build || true  # don't fail to preserve logs
 
     - name: Upload build logs
