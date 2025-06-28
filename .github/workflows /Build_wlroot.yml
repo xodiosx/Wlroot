@@ -1,4 +1,4 @@
-name: Build wlroots with termux-display-client
+name: Build wlroots 2
 
 on:
   workflow_dispatch:
