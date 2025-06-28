@@ -46,18 +46,18 @@ jobs:
 
         meson setup build \
           --cross-file <(cat <<EOF
-[binaries]
-c = '$CC'
-cpp = '$CXX'
-ar = '$AR'
-pkgconfig = 'pkg-config'
+        [binaries]
+         c = '$CC'
+         cpp = '$CXX'
+         ar = '$AR'
+         pkgconfig = 'pkg-config'
 
-[host_machine]
-system = 'android'
-cpu_family = 'aarch64'
-cpu = 'armv8-a'
-endian = 'little'
-EOF
+       [host_machine]
+        system = 'android'
+       cpu_family = 'aarch64'
+       cpu = 'armv8-a'
+       endian = 'little'
+       EOF
           ) \
           --buildtype release \
           -Dbackends=termuxdc \
