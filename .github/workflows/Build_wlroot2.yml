@@ -1,40 +1,34 @@
-name: Build wlroots2
+name: Build wlroots for Termux
 
 on:
   workflow_dispatch:
-  push:
-    branches: [wlroots-display-client]
-  pull_request:
-    branches: [wlroots-display-client]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     container:
       image: ghcr.io/termux/termux-docker:latest
 
     steps:
-    - name: Install required packages inside container
+    - name: Install required packages
       run: |
         apt update
         apt install -y git wget unzip build-essential clang \
-          automake autoconf libtool pkg-config ninja-build \
-          cmake curl zip python3
+          automake autoconf libtool pkg-config ninja-build cmake curl zip
 
     - name: Clone termux-packages
-      uses: actions/checkout@v4
-      with:
-        repository: termux/termux-packages
-        path: termux-packages
+      run: git clone https://github.com/termux/termux-packages
 
-    - name: Create custom build.sh for wlroots-termux
+    - name: Add wlroots source and build.sh
       run: |
-        mkdir -p termux-packages/x11-packages/wlroots-termux
+        cd termux-packages
+        mkdir -p x11-packages/wlroots-termux
         wget https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
         sha256=$(sha256sum wlroots-display-client.tar.gz | cut -d' ' -f1)
-        cat > termux-packages/x11-packages/wlroots-termux/build.sh <<EOF
-TERMUX_PKG_DESCRIPTION="Modular Wayland compositor library"
+        mv wlroots-display-client.tar.gz .
+
+        cat > x11-packages/wlroots-termux/build.sh <<EOF
+TERMUX_PKG_DESCRIPTION="Wayland compositor library with termux backend"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@xodiosx"
 TERMUX_PKG_VERSION=0.18.2
@@ -44,8 +38,8 @@ TERMUX_PKG_AUTO_UPDATE=false
 
 TERMUX_PKG_DEPENDS="libdrm, libglvnd, libwayland, libxcb, libxkbcommon, xcb-util-renderutil, xcb-util-wm, termux-gui-c, termux-display-client"
 TERMUX_PKG_BUILD_DEPENDS="libglvnd-dev, libwayland-cross-scanner, libwayland-protocols, xwayland"
-TERMUX_PKG_RECOMMENDS="xwayland"
 TERMUX_PKG_BREAKS="sway (<< 1.10)"
+TERMUX_PKG_RECOMMENDS="xwayland"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
   -Dexamples=true
@@ -61,16 +55,11 @@ termux_step_pre_configure() {
 }
 EOF
 
-    - name: Move source tarball to correct location
-      run: |
-        mv wlroots-display-client.tar.gz termux-packages/
-
-    - name: Build DEB with termux-packages
+    - name: Build DEB
       working-directory: termux-packages
-      run: |
-        ./build-package.sh -a aarch64 x11-packages/wlroots-termux
+      run: ./build-package.sh -a aarch64 x11-packages/wlroots-termux
 
-    - name: Upload DEB artifact
+    - name: Upload DEB
       uses: actions/upload-artifact@v4
       with:
         name: wlroots-termux-deb
