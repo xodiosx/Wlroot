@@ -61,6 +61,9 @@ jobs:
         
     - name: Prepare Wayland sysroot for cross-build
       run: |
+       ls /usr/local/include/
+       ls /usr/local/include/wayland
+       ls /usr/share/include/wayland
         mkdir -p $GITHUB_WORKSPACE/sysroot/include
         mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
         cp -r /usr/local/include/wayland $GITHUB_WORKSPACE/sysroot/include/
