@@ -115,22 +115,6 @@ jobs:
         export CXXFLAGS="-I/usr/include/wayland"
         cat > android-cross.txt <<EOF
         [binaries]
-  meson setup build \
-      --cross-file android-cross-file.txt \
-      --prefix=$GITHUB_WORKSPACE/sysroot \
-      --buildtype=release \
-      -Dbackends=termuxdc \
-      -Drenderers=auto \
-      -Dwerror=false
-
-    ninja -C build      c = '$CC'
-        cpp = '$CXX'
-        ar = '$AR'
-        pkg-config = 'pkg-config'
-        strip = '$TOOLCHAIN/bin/llvm-strip'
-        
-        cat > android-cross.txt <<EOF
-        [binaries]
         c = '$CC'
         cpp = '$CXX'
         ar = '$AR'
