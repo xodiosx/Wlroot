@@ -61,10 +61,10 @@ jobs:
        mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
 
        # Copy headers generated into build dir
-       cp -r wayland/src/* $GITHUB_WORKSPACE/sysroot/include/wayland/ 
+       cp -r src/* $GITHUB_WORKSPACE/sysroot/include/wayland/ 
 
        # Copy .pc files so pkg-config can find them
-         cp build/wayland* $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
+         cp build/* $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
          sudo ninja -C build install
          cd ..
         
