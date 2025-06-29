@@ -47,19 +47,19 @@ jobs:
         git checkout 1.23.0
 
         cat > android-cross.txt <<EOF
-[binaries]
-c = '$TOOLCHAIN/bin/aarch64-linux-android26-clang'
-cpp = '$TOOLCHAIN/bin/aarch64-linux-android26-clang++'
-ar = '$TOOLCHAIN/bin/llvm-ar'
-strip = '$TOOLCHAIN/bin/llvm-strip'
-pkgconfig = 'pkg-config'
-
-[host_machine]
-system = 'android'
-cpu_family = 'aarch64'
-cpu = 'armv8-a'
-endian = 'little'
-EOF
+        [binaries]
+        c = '$TOOLCHAIN/bin/aarch64-linux-android26-clang'
+        cpp = '$TOOLCHAIN/bin/aarch64-linux-android26-clang++'
+        ar = '$TOOLCHAIN/bin/llvm-ar'
+        strip = '$TOOLCHAIN/bin/llvm-strip'
+        pkgconfig = 'pkg-config'
+        
+        [host_machine]
+        system = 'android'
+        cpu_family = 'aarch64'
+        cpu = 'armv8-a'
+        endian = 'little'
+        EOF
 
         meson setup build-android --cross-file android-cross.txt \
           --prefix=$SYSROOT \
@@ -87,19 +87,19 @@ EOF
         export LDFLAGS="-L$SYSROOT/lib"
 
         cat > android-cross.txt <<EOF
-[binaries]
-c = '$CC'
-cpp = '$CXX'
-ar = '$AR'
-pkgconfig = 'pkg-config'
-strip = '$TOOLCHAIN/bin/llvm-strip'
-
-[host_machine]
-system = 'android'
-cpu_family = 'aarch64'
-cpu = 'armv8-a'
-endian = 'little'
-EOF
+        [binaries]
+        c = '$CC'
+        cpp = '$CXX'
+        ar = '$AR'
+        pkgconfig = 'pkg-config'
+        strip = '$TOOLCHAIN/bin/llvm-strip'
+        
+        [host_machine]
+        system = 'android'
+        cpu_family = 'aarch64'
+        cpu = 'armv8-a'
+        endian = 'little'
+        EOF
 
         meson setup build \
           --cross-file android-cross.txt \
