@@ -129,6 +129,14 @@ jobs:
         pkg-config = 'pkg-config'
         strip = '$TOOLCHAIN/bin/llvm-strip'
         
+        cat > android-cross.txt <<EOF
+        [binaries]
+        c = '$CC'
+        cpp = '$CXX'
+        ar = '$AR'
+        pkg-config = 'pkg-config'
+        strip = '$TOOLCHAIN/bin/llvm-strip'
+        
         [host_machine]
         system = 'android'
         cpu_family = 'aarch64'
