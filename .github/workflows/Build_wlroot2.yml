@@ -64,7 +64,7 @@ jobs:
        cp -r src/wayland*.h $GITHUB_WORKSPACE/sysroot/include/wayland/ 
 
        # Copy .pc files so pkg-config can find them
-         cp build/wayland*.h $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
+         cp build/wayland*.pc $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
          sudo ninja -C build install
          cd ..
         
