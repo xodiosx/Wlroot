@@ -63,9 +63,8 @@ jobs:
       run: |
         mkdir -p $GITHUB_WORKSPACE/sysroot/include
         mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
-        cp -r /usr/include/wayland $GITHUB_WORKSPACE/sysroot/include/
-        cp /usr/lib/pkgconfig/wayland*.pc $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
-        
+        cp -r /usr/local/include/wayland $GITHUB_WORKSPACE/sysroot/include/
+        cp /usr/local/lib/pkgconfig/wayland*.pc $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
 
     - name: Install Android NDK
       run: |
