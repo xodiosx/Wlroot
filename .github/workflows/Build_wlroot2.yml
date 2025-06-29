@@ -46,7 +46,17 @@ jobs:
           libxml2-dev \
           libexpat1-dev wayland*
         
+    - name: Build and install Wayland 1.23.0
+      run: |
+        git clone https://gitlab.freedesktop.org/wayland/wayland.git
+        cd wayland
+        git checkout 1.23.0
 
+        meson setup build --prefix=/usr
+        ninja -C build
+        sudo ninja -C build install
+
+        cd ..
 
     - name: Install Android NDK
       run: |
