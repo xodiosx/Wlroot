@@ -55,21 +55,21 @@ jobs:
        mkdir -p $GITHUB_WORKSPACE/sysroot/include
        mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
        meson setup build --prefix=/usr -Ddocumentation=false
-       ninja -C build
+       sudo ninja -C build install
 
        mkdir -p $GITHUB_WORKSPACE/sysroot/include/wayland
        mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
 
        # Copy headers generated into build dir
        cp -r src/wayland*.h $GITHUB_WORKSPACE/sysroot/include/wayland/ 
-
-       # Copy .pc files so pkg-config can find them
-         cp build/wayland*.pc $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
-         sudo ninja -C build install
-         cd ..
+       
+       # build files so ndk can find them
+        meson setup build --prefix=$GITHUB_WORKSPACE/sysroot --buildtype=release
+        rm -rf  build         
+        sudo ninja -C build install
+        cd ..
         
     
-
     - name: Install Android NDK
       run: |
         wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
