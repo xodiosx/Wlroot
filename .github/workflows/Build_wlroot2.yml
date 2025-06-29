@@ -2,6 +2,10 @@ name: Build wlroots for Termux
 
 on:
   workflow_dispatch:
+  push:
+    branches: [wlroots-display-client]
+  pull_request:
+    branches: [wlroots-display-client]
 
 jobs:
   build:
