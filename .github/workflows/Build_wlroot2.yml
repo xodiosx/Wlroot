@@ -1,4 +1,4 @@
-name: Build wlroot2
+name: Build wlroot2a
 
 on:
   workflow_dispatch:
