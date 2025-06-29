@@ -87,7 +87,7 @@ jobs:
         c = '$CC'
         cpp = '$CXX'
         ar = '$AR'
-        pkgconfig = 'pkg-config'
+        pkg-config = 'pkg-config'
         strip = '$TOOLCHAIN/bin/llvm-strip'
         
         [host_machine]
