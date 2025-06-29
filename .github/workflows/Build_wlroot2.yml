@@ -81,7 +81,8 @@ jobs:
         export PKG_CONFIG_PATH=$SYSROOT/lib/pkgconfig
         export CFLAGS="-I$SYSROOT/include"
         export LDFLAGS="-L$SYSROOT/lib"
-
+        export CFLAGS="-I/usr/include/wayland"
+        export CXXFLAGS="-I/usr/include/wayland"
         cat > android-cross.txt <<EOF
         [binaries]
         c = '$CC'
