@@ -26,7 +26,7 @@ jobs:
         c = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang'
         cpp = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang++'
          ar = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar'
-         pkgconfig = 'pkg-config'
+         pkg-config = 'pkg-config'
     
            [host_machine]
            system = 'android'
@@ -78,7 +78,7 @@ jobs:
          c = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang'
          cpp = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang++'
          ar = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar'
-         pkgconfig = 'pkg-config'
+         pkg-config = 'pkg-config'
     
            [host_machine]
            system = 'android'
