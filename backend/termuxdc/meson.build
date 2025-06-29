@@ -23,28 +23,28 @@ jobs:
         curl -LO https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
         SHA256=$(sha256sum wlroots-display-client.tar.gz | cut -d' ' -f1)
         cat > build.sh <<EOF
-TERMUX_PKG_HOMEPAGE=https://gitlab.freedesktop.org/wlroots/wlroots
-TERMUX_PKG_DESCRIPTION="Modular Wayland compositor library"
-TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@xodiosx"
-TERMUX_PKG_VERSION=0.18.2
-TERMUX_PKG_SRCURL=https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
-TERMUX_PKG_SHA256=$SHA256
-TERMUX_PKG_DEPENDS="libdrm, libglvnd, libwayland, libxcb, libxkbcommon, xcb-util-renderutil, xcb-util-wm, termux-gui-c, termux-display-client"
-TERMUX_PKG_BUILD_DEPENDS="libglvnd-dev, libwayland-protocols"
-TERMUX_PKG_RECOMMENDS="xwayland"
-TERMUX_PKG_BREAKS="sway (<< 1.10)"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-  -Dexamples=false
-  -Dxwayland=enabled
-  -Dsession=disabled
-  -Dbackends=x11,termuxgui,termuxdc
-  -Drenderers=gles2,vulkan
-"
-termux_step_pre_configure() {
-  export CPPFLAGS+=" -Wno-alloca -Wno-strict-prototypes"
-}
-EOF
+		TERMUX_PKG_HOMEPAGE=https://gitlab.freedesktop.org/wlroots/wlroots
+		TERMUX_PKG_DESCRIPTION="Modular Wayland compositor library"
+		TERMUX_PKG_LICENSE="MIT"
+		TERMUX_PKG_MAINTAINER="@xodiosx"
+		TERMUX_PKG_VERSION=0.18.2
+		TERMUX_PKG_SRCURL=https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
+		TERMUX_PKG_SHA256=$SHA256
+		TERMUX_PKG_DEPENDS="libdrm, libglvnd, libwayland, libxcb, libxkbcommon, xcb-util-renderutil, xcb-util-wm, termux-gui-c, termux-display-client"
+		TERMUX_PKG_BUILD_DEPENDS="libglvnd-dev, libwayland-protocols"
+		TERMUX_PKG_RECOMMENDS="xwayland"
+		TERMUX_PKG_BREAKS="sway (<< 1.10)"
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+		  -Dexamples=false
+		  -Dxwayland=enabled
+		  -Dsession=disabled
+		  -Dbackends=x11,termuxgui,termuxdc
+		  -Drenderers=gles2,vulkan
+		"
+		termux_step_pre_configure() {
+		  export CPPFLAGS+=" -Wno-alloca -Wno-strict-prototypes"
+		}
+		EOF
 
     - name: Install Android NDK
       run: |
