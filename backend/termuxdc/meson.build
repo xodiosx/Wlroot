@@ -1,4 +1,4 @@
-termuxdc = cc.find_library('termux-display-client', dirs: ['deps'])
+termuxdc = cc.find_library('termux-display-client', dirs: [meson.project_source_root() + '/deps'])
 
 if not termuxdc.found()
     error('termux-display-client not found in deps directory')
