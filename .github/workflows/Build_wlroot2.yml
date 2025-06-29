@@ -57,16 +57,16 @@ jobs:
        meson setup build --prefix=/usr -Ddocumentation=false
        ninja -C build
 
-        mkdir -p $GITHUB_WORKSPACE/sysroot/include/wayland
-        mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
+       mkdir -p $GITHUB_WORKSPACE/sysroot/include/wayland
+       mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
 
        # Copy headers generated into build dir
-         cp -r wayland/protocol/*.h $GITHUB_WORKSPACE/sysroot/include/wayland/ 
+       cp -r wayland/src/wayland*.h $GITHUB_WORKSPACE/sysroot/include/wayland/ 
 
        # Copy .pc files so pkg-config can find them
-          cp build/wayland*.pc $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
-          sudo ninja -C build install
-           cd ..
+         cp build/wayland*.pc $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
+         sudo ninja -C build install
+         cd ..
         
     
 
