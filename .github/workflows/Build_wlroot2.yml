@@ -61,7 +61,7 @@ jobs:
        mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
 
        # Copy headers generated into build dir
-       cp -r wayland/src/wayland*.h $GITHUB_WORKSPACE/sysroot/include/wayland/ 
+       cp -r wayland/src/*.h $GITHUB_WORKSPACE/sysroot/include/wayland/ 
 
        # Copy .pc files so pkg-config can find them
          cp build/wayland*.pc $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
