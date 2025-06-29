@@ -44,7 +44,7 @@ jobs:
           libxcb-xfixes0-dev \
           libffi-dev \
           libxml2-dev \
-          libexpat1-dev \  
+          libexpat1-dev 
         
 
 
