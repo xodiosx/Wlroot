@@ -60,13 +60,9 @@ jobs:
   
         # 2. Set up sysroot (for Android)
         mkdir -p $GITHUB_WORKSPACE/sysroot/include
-        mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
+        mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconf
 
-        # 3. Cross-build Wayland into the sysroot for NDK
-        meson setup build-sysroot \
-              --prefix=$GITHUB_WORKSPACE/sysroot \
-              --cross-file <(cat <<EOF
-                      meson setup build-sysroot \
+             meson setup build-sysroot \
               --prefix=$GITHUB_WORKSPACE/sysroot \
               --cross-file <(cat <<EOF
             [binaries]
