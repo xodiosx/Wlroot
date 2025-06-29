@@ -50,11 +50,12 @@ jobs:
             EOF
 
 
-    - name: Add custom wlroots build script
+    - name: Install Android NDK
       run: |
-        mkdir -p termux-packages/x11-packages/wlroots-termux
-        curl -Lo termux-packages/x11-packages/wlroots-termux/build.sh https://raw.githubusercontent.com/xodiosx/wlroots/main/scripts/termux-build.sh
-
+        wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
+        unzip android-ndk-r27c-linux.zip -d $HOME
+        export NDK=$HOME/android-ndk-r27c 
+       
     - name: Download and verify wlroots source
       run: |
         wget https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
@@ -70,6 +71,7 @@ jobs:
     - name: Build DEB using termux-packages
       working-directory: termux-packages
       run: |
+        export NDK=$HOME/android-ndk-r27c
         ./build-package.sh -a aarch64 wlroots-termux
 
     - name: Upload DEB artifact
