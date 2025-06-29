@@ -1,162 +1,75 @@
-name: Build wlroot2a
+name: Build wlroots for Termux
 
 on:
   workflow_dispatch:
-  push:
-    branches: [wlroots-display-client]
-  pull_request:
-    branches: [wlroots-display-client]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout wlroots repo
+    - name: Clone termux-packages
       uses: actions/checkout@v4
       with:
-        repository: xodiosx/wlroots
-        ref: wlroots-display-client
-        submodules: recursive
+        repository: termux/termux-packages
+        path: termux-packages
 
-    - name: Write Meson cross-file
+    - name: Create build.sh for wlroots-termux
       run: |
-        cat <<EOF > android-cross-file.txt
-        [binaries]
-        c = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang'
-        cpp = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang++'
-         ar = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar'
-         pkg-config = 'pkg-config'
-    
-           [host_machine]
-           system = 'android'
-           cpu_family = 'aarch64'
-           cpu = 'armv8-a'
-            endian = 'little'
+        mkdir -p termux-packages/x11-packages/wlroots-termux
+        cat <<EOF > termux-packages/x11-packages/wlroots-termux/build.sh
+          TERMUX_PKG_DESCRIPTION="Modular Wayland compositor library"
+            TERMUX_PKG_LICENSE="MIT"
+            TERMUX_PKG_MAINTAINER="@xodiosx"
+            TERMUX_PKG_VERSION=0.18.2
+            TERMUX_PKG_SRCURL=https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
+            TERMUX_PKG_SHA256=$(wget -qO- https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz | sha256sum | cut -d' ' -f1)
+            TERMUX_PKG_AUTO_UPDATE=false
+            
+            TERMUX_PKG_DEPENDS="libdrm, libglvnd, libwayland, libxcb, libxkbcommon, xcb-util-renderutil, xcb-util-wm, termux-gui-c, termux-display-client"
+            TERMUX_PKG_BUILD_DEPENDS="libglvnd-dev, libwayland-cross-scanner, libwayland-protocols, xwayland"
+            TERMUX_PKG_RECOMMENDS="xwayland"
+            TERMUX_PKG_BREAKS="sway (<< 1.10)"
+            
+            TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+              -Dexamples=true
+              -Dxwayland=enabled
+              -Dsession=disabled
+              -Dbackends=x11,termuxgui,termuxdc
+              -Drenderers=gles2,vulkan
+            "
+            
+            termux_step_pre_configure() {
+              export PATH="\$TERMUX_PREFIX/opt/libwayland/cross/bin:\$PATH"
+              export CPPFLAGS+=" -Wno-alloca -Wno-strict-prototypes"
+            }
             EOF
+
+
+    - name: Add custom wlroots build script
+      run: |
+        mkdir -p termux-packages/x11-packages/wlroots-termux
+        curl -Lo termux-packages/x11-packages/wlroots-termux/build.sh https://raw.githubusercontent.com/xodiosx/wlroots/main/scripts/termux-build.sh
+
+    - name: Download and verify wlroots source
+      run: |
+        wget https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
+        sha256sum wlroots-display-client.tar.gz
 
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y \
-          meson ninja-build \
-          pkg-config \
-          wayland-protocols \
-          libpixman-1-dev \
-          zip cmake \
-          clang pkg-config \
-          gcc g++ \
-          libpixman-1-dev \
-          libwayland-dev \
-          libegl1-mesa-dev \
-          libdrm-dev \
-          libxkbcommon-dev \
-          libgbm-dev \
-          libudev-dev \
-          libinput-dev \
-          libxcb1-dev \
-          libxcb-render0-dev \
-          libxcb-shm0-dev \
-          libxcb-xfixes0-dev \
-          libffi-dev \
-          libxml2-dev graphviz \
-          libexpat1-dev wayland*
+        sudo apt install -y git wget unzip build-essential clang \
+          automake autoconf libtool pkg-config ninja-build \
+          cmake libdrm-dev libxkbcommon-dev libpixman-1-dev
 
-
-    - name: Build and install Wayland 1.23.0 (host + NDK sysroot)
+    - name: Build DEB using termux-packages
+      working-directory: termux-packages
       run: |
-        git clone https://gitlab.freedesktop.org/wayland/wayland.git
-        cd wayland
-        git checkout 1.23.0
+        ./build-package.sh -a aarch64 wlroots-termux
 
-        # 1. Host install (needed for wayland-scanner)
-        meson setup build-host --prefix=/usr -Ddocumentation=false
-        ninja -C build-host
-        sudo ninja -C build-host install
-        cat > android-cross-file.txt <<EOF
-        [binaries]
-         c = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang'
-         cpp = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang++'
-         ar = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar'
-         pkg-config = 'pkg-config'
-    
-           [host_machine]
-           system = 'android'
-           cpu_family = 'aarch64'
-           cpu = 'armv8-a'
-            endian = 'little'
-            EOF
-        # 2. Set up sysroot (for Android)
-        mkdir -p $GITHUB_WORKSPACE/sysroot/include
-        mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconf
-          meson setup build \
-          --cross-file android-cross-file.txt \
-           --prefix=$GITHUB_WORKSPACE/sysroot \
-           --buildtype=release \
-           -Dbackends=termuxdc \
-           -Drenderers=auto \
-           -Dwerror=false
-
-           ninja -C build
-           
-            cd ..
-        
-    
-    - name: Install Android NDK
-      run: |
-        wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
-        unzip android-ndk-r27c-linux.zip -d $HOME
-        echo "ANDROID_NDK=$HOME/android-ndk-r27c" >> $GITHUB_ENV
-        echo "$HOME/android-ndk-r27c" >> $GITHUB_PATH
-
-
-
-    - name: Configure and build wlroots with Meson for Android
-      run: |
-        export NDK=$HOME/android-ndk-r27c
-        export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
-        export SYSROOT=$HOME/sysroot
-        
-        export AR=$TOOLCHAIN/bin/llvm-ar
-        export CC=$TOOLCHAIN/bin/aarch64-linux-android26-clang
-        export CXX=$TOOLCHAIN/bin/aarch64-linux-android26-clang++
-        export PKG_CONFIG_PATH=$SYSROOT/lib/pkgconfig
-        export CFLAGS="-I$SYSROOT/include"
-        export LDFLAGS="-L$SYSROOT/lib"
-        export CFLAGS="-I/usr/include/wayland"
-        export CXXFLAGS="-I/usr/include/wayland"
-        cat > android-cross.txt <<EOF
-        [binaries]
-        c = '$CC'
-        cpp = '$CXX'
-        ar = '$AR'
-        pkg-config = 'pkg-config'
-        strip = '$TOOLCHAIN/bin/llvm-strip'
-        
-        [host_machine]
-        system = 'android'
-        cpu_family = 'aarch64'
-        cpu = 'armv8-a'
-        endian = 'little'
-        EOF
-
-        meson setup build \
-          --cross-file android-cross.txt \
-          --buildtype=release \
-          --prefix=$SYSROOT \
-          -Dbackends=termuxdc \
-          -Dexamples=false \
-          -Dwerror=false \
-          -Dxwayland=disabled
-
-        ninja -C build
-
-    - name: Zip build output
-      run: |
-        zip -r wlroots-arm64-build.zip build/
-
-    - name: Upload zip artifact
+    - name: Upload DEB artifact
       uses: actions/upload-artifact@v4
       with:
-        name: wlroots-arm64
-        path: wlroots-arm64-build.zip
+        name: wlroots-termux-deb
+        path: termux-packages/output/*.deb
