@@ -1,4 +1,8 @@
-termuxdc = cc.find_library('termux-display-client')
+termuxdc = cc.find_library('termux-display-client', dirs: ['deps'])
+
+if not termuxdc.found()
+    error('termux-display-client not found in deps directory')
+endif
 
 if not termuxdc.found()
 	subdir_done()
