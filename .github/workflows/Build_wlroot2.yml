@@ -62,10 +62,10 @@ jobs:
 
        # Copy headers generated into build dir
        cp -r src/wayland*.h $GITHUB_WORKSPACE/sysroot/include/wayland/ 
-       
+       meson setup --wipe
        # build files so ndk can find them
         meson setup build --prefix=$GITHUB_WORKSPACE/sysroot --buildtype=release
-        rm -rf  build         
+                 
         sudo ninja -C build install
         cd ..
         
