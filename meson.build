@@ -146,7 +146,7 @@ wlr_deps = [
 	math,
 	rt,
 ]
-
+wlr_files = [] 
 subdir('protocol')
 subdir('render')
 
