@@ -58,7 +58,14 @@ jobs:
        sudo ninja -C build install
     
         cd ..
-          
+        
+    - name: Prepare Wayland sysroot for cross-build
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/sysroot/include
+        mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
+        cp -r /usr/include/wayland $GITHUB_WORKSPACE/sysroot/include/
+        cp /usr/lib/pkgconfig/wayland*.pc $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
+        
 
     - name: Install Android NDK
       run: |
