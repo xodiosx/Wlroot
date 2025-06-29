@@ -27,7 +27,24 @@ jobs:
           pkg-config \
           wayland-protocols \
           libpixman-1-dev \
-          zip libwayland-dev  
+          zip cmake \
+          clang pkg-config \
+          gcc g++ \
+          libpixman-1-dev \
+          libwayland-dev \
+          libegl1-mesa-dev \
+          libdrm-dev \
+          libxkbcommon-dev \
+          libgbm-dev \
+          libudev-dev \
+          libinput-dev \
+          libxcb1-dev \
+          libxcb-render0-dev \
+          libxcb-shm0-dev \
+          libxcb-xfixes0-dev \
+          libffi-dev \
+          libxml2-dev \
+          libexpat1-dev \  
         
 
 
