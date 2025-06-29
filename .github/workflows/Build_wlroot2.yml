@@ -116,7 +116,7 @@ jobs:
         export NDK=$HOME/android-ndk-r27c
         export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
         export SYSROOT=$HOME/sysroot
-        ls /usr/include/wayland/wayland-util.h
+        
         export AR=$TOOLCHAIN/bin/llvm-ar
         export CC=$TOOLCHAIN/bin/aarch64-linux-android26-clang
         export CXX=$TOOLCHAIN/bin/aarch64-linux-android26-clang++
