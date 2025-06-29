@@ -136,9 +136,8 @@ pixman = dependency('pixman-1',
 	default_options: ['werror=false'],
 )
 math = cc.find_library('m')
-rt = cc.find_library('rt')
+rt = cc.find_library('rt', required: host_machine.system() != 'android')
 
-wlr_files = []
 wlr_deps = [
 	wayland_server,
 	drm,
