@@ -52,22 +52,23 @@ jobs:
        git clone https://gitlab.freedesktop.org/wayland/wayland.git
        cd wayland
        git checkout 1.23.0
-    
+       mkdir -p $GITHUB_WORKSPACE/sysroot/include
+       mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
        meson setup build --prefix=/usr -Ddocumentation=false
        ninja -C build
-       sudo ninja -C build install
-    
-        cd ..
-        
-    - name: Prepare Wayland sysroot for cross-build
-      run: |
-       ls /usr/local/include/
-       ls /usr/local/include/wayland
-       ls /usr/share/include/wayland
-        mkdir -p $GITHUB_WORKSPACE/sysroot/include
+
+        mkdir -p $GITHUB_WORKSPACE/sysroot/include/wayland
         mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconfig
-        cp -r /usr/local/include/include/wayland $GITHUB_WORKSPACE/sysroot/include/
-        cp /usr/local/lib/pkgconfig/wayland*.pc $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
+
+       # Copy headers generated into build dir
+         cp -r build/include/wayland/* $GITHUB_WORKSPACE/sysroot/include/wayland/
+
+       # Copy .pc files so pkg-config can find them
+          cp build/wayland*.pc $GITHUB_WORKSPACE/sysroot/lib/pkgconfig/
+          sudo ninja -C build install
+           cd ..
+        
+    
 
     - name: Install Android NDK
       run: |
