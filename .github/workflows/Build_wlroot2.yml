@@ -1,4 +1,4 @@
-name: Build wlroots for Termux
+name: Build wlroots2
 
 on:
   workflow_dispatch:
@@ -11,68 +11,64 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    container:
+      image: ghcr.io/termux/termux-docker:latest
+
     steps:
+    - name: Install required packages inside container
+      run: |
+        apt update
+        apt install -y git wget unzip build-essential clang \
+          automake autoconf libtool pkg-config ninja-build \
+          cmake curl zip python3
+
     - name: Clone termux-packages
       uses: actions/checkout@v4
       with:
         repository: termux/termux-packages
         path: termux-packages
 
-    - name: Create build.sh for wlroots-termux
+    - name: Create custom build.sh for wlroots-termux
       run: |
         mkdir -p termux-packages/x11-packages/wlroots-termux
-        cat <<EOF > termux-packages/x11-packages/wlroots-termux/build.sh
-          TERMUX_PKG_DESCRIPTION="Modular Wayland compositor library"
-            TERMUX_PKG_LICENSE="MIT"
-            TERMUX_PKG_MAINTAINER="@xodiosx"
-            TERMUX_PKG_VERSION=0.18.2
-            TERMUX_PKG_SRCURL=https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
-            TERMUX_PKG_SHA256=$(wget -qO- https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz | sha256sum | cut -d' ' -f1)
-            TERMUX_PKG_AUTO_UPDATE=false
-            
-            TERMUX_PKG_DEPENDS="libdrm, libglvnd, libwayland, libxcb, libxkbcommon, xcb-util-renderutil, xcb-util-wm, termux-gui-c, termux-display-client"
-            TERMUX_PKG_BUILD_DEPENDS="libglvnd-dev, libwayland-cross-scanner, libwayland-protocols, xwayland"
-            TERMUX_PKG_RECOMMENDS="xwayland"
-            TERMUX_PKG_BREAKS="sway (<< 1.10)"
-            
-            TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-              -Dexamples=true
-              -Dxwayland=enabled
-              -Dsession=disabled
-              -Dbackends=x11,termuxgui,termuxdc
-              -Drenderers=gles2,vulkan
-            "
-            
-            termux_step_pre_configure() {
-              export PATH="\$TERMUX_PREFIX/opt/libwayland/cross/bin:\$PATH"
-              export CPPFLAGS+=" -Wno-alloca -Wno-strict-prototypes"
-            }
-            EOF
-
-
-    - name: Install Android NDK
-      run: |
-        wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
-        unzip android-ndk-r27c-linux.zip -d $HOME
-        export NDK=$HOME/android-ndk-r27c 
-       
-    - name: Download and verify wlroots source
-      run: |
         wget https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
-        sha256sum wlroots-display-client.tar.gz
+        sha256=$(sha256sum wlroots-display-client.tar.gz | cut -d' ' -f1)
+        cat > termux-packages/x11-packages/wlroots-termux/build.sh <<EOF
+TERMUX_PKG_DESCRIPTION="Modular Wayland compositor library"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@xodiosx"
+TERMUX_PKG_VERSION=0.18.2
+TERMUX_PKG_SRCURL=https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
+TERMUX_PKG_SHA256=$sha256
+TERMUX_PKG_AUTO_UPDATE=false
 
-    - name: Install dependencies
+TERMUX_PKG_DEPENDS="libdrm, libglvnd, libwayland, libxcb, libxkbcommon, xcb-util-renderutil, xcb-util-wm, termux-gui-c, termux-display-client"
+TERMUX_PKG_BUILD_DEPENDS="libglvnd-dev, libwayland-cross-scanner, libwayland-protocols, xwayland"
+TERMUX_PKG_RECOMMENDS="xwayland"
+TERMUX_PKG_BREAKS="sway (<< 1.10)"
+
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+  -Dexamples=true
+  -Dxwayland=enabled
+  -Dsession=disabled
+  -Dbackends=x11,termuxgui,termuxdc
+  -Drenderers=gles2,vulkan
+"
+
+termux_step_pre_configure() {
+  export PATH="\$TERMUX_PREFIX/opt/libwayland/cross/bin:\$PATH"
+  export CPPFLAGS+=" -Wno-alloca -Wno-strict-prototypes"
+}
+EOF
+
+    - name: Move source tarball to correct location
       run: |
-        sudo apt update
-        sudo apt install -y git wget unzip build-essential clang \
-          automake autoconf libtool pkg-config ninja-build \
-          cmake libdrm-dev libxkbcommon-dev libpixman-1-dev
+        mv wlroots-display-client.tar.gz termux-packages/
 
-    - name: Build DEB using termux-packages
+    - name: Build DEB with termux-packages
       working-directory: termux-packages
       run: |
-        export NDK=$HOME/android-ndk-r27c
-        ./build-package.sh -a aarch64 wlroots-termux
+        ./build-package.sh -a aarch64 x11-packages/wlroots-termux
 
     - name: Upload DEB artifact
       uses: actions/upload-artifact@v4
