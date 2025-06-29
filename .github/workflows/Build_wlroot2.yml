@@ -23,11 +23,28 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y \
-          meson ninja-build pkg-config zip cmake clang gcc g++ \
-          libpixman-1-dev libegl1-mesa-dev libdrm-dev \
-          libxkbcommon-dev libgbm-dev libudev-dev libinput-dev \
-          libxcb1-dev libxcb-render0-dev libxcb-shm0-dev libxcb-xfixes0-dev \
-          libffi-dev libxml2-dev graphviz libexpat1-dev
+          meson ninja-build \
+          pkg-config \
+          wayland-protocols \
+          libpixman-1-dev \
+          zip cmake \
+          clang pkg-config \
+          gcc g++ \
+          libpixman-1-dev \
+          libwayland-dev \
+          libegl1-mesa-dev \
+          libdrm-dev \
+          libxkbcommon-dev \
+          libgbm-dev \
+          libudev-dev \
+          libinput-dev \
+          libxcb1-dev \
+          libxcb-render0-dev \
+          libxcb-shm0-dev \
+          libxcb-xfixes0-dev \
+          libffi-dev \
+          libxml2-dev graphviz \
+          libexpat1-dev wayland*
 
     - name: Install Android NDK
       run: |
