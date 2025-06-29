@@ -73,7 +73,18 @@ jobs:
         meson setup build-host --prefix=/usr -Ddocumentation=false
         ninja -C build-host
         sudo ninja -C build-host install
-
+        [binaries]
+        c = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang'
+        cpp = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang++'
+         ar = '$HOME/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar'
+         pkgconfig = 'pkg-config'
+    
+           [host_machine]
+           system = 'android'
+           cpu_family = 'aarch64'
+           cpu = 'armv8-a'
+            endian = 'little'
+            EOF
         # 2. Set up sysroot (for Android)
         mkdir -p $GITHUB_WORKSPACE/sysroot/include
         mkdir -p $GITHUB_WORKSPACE/sysroot/lib/pkgconf
