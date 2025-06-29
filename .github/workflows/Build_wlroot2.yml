@@ -103,7 +103,6 @@ jobs:
           --prefix=$SYSROOT \
           -Dbackends=termuxdc \
           -Dexamples=false \
-          -Ddocumentation=false \
           -Dwerror=false \
           -Dxwayland=disabled
 
