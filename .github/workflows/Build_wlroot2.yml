@@ -50,7 +50,7 @@ jobs:
 
     - name: Simulate Termux /data environment
       run: |
-       export FAKE_DATA=$HOME/fake-data
+       export FAKE_DATA=$HOME
        mkdir -p $FAKE_DATA/data/data/com.termux/files/usr
        mkdir -p $FAKE_DATA/data/_databackups/aarch64
 
