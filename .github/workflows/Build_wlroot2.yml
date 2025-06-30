@@ -49,19 +49,19 @@ jobs:
         EOF
 
     - name: Simulate Termux /data environment
-  run: |
-    export FAKE_DATA=$HOME/fake-data
-    mkdir -p $FAKE_DATA/data/data/com.termux/files/usr
-    mkdir -p $FAKE_DATA/data/_databackups/aarch64
+      run: |
+       export FAKE_DATA=$HOME/fake-data
+       mkdir -p $FAKE_DATA/data/data/com.termux/files/usr
+       mkdir -p $FAKE_DATA/data/_databackups/aarch64
 
-    echo "aarch64" > $FAKE_DATA/data/TERMUX_ARCH
-    echo "com.termux" > $FAKE_DATA/data/TERMUX_APP_PACKAGE
+        echo "aarch64" > $FAKE_DATA/data/TERMUX_ARCH
+        echo "com.termux" > $FAKE_DATA/data/TERMUX_APP_PACKAGE
 
-    echo "export TERMUX_PREFIX=$FAKE_DATA/data/data/com.termux/files/usr" >> $GITHUB_ENV
-    echo "export TERMUX_ARCH=aarch64" >> $GITHUB_ENV
-    echo "export TERMUX_APP_PACKAGE=com.termux" >> $GITHUB_ENV
-    echo "export TERMUX_TOPDIR=$FAKE_DATA" >> $GITHUB_ENV
-    echo "export HOME=$FAKE_DATA" >> $GITHUB_ENV
+        echo "export TERMUX_PREFIX=$FAKE_DATA/data/data/com.termux/files/usr" >> $GITHUB_ENV
+       echo "export TERMUX_ARCH=aarch64" >> $GITHUB_ENV
+       echo "export TERMUX_APP_PACKAGE=com.termux" >> $GITHUB_ENV
+       echo "export TERMUX_TOPDIR=$FAKE_DATA" >> $GITHUB_ENV
+       echo "export HOME=$FAKE_DATA" >> $GITHUB_ENV
    
     - name: Install Android NDK
       run: |
