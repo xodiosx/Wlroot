@@ -1,4 +1,4 @@
-name: Build wlroots for Termux
+name: Build wlroo3
 
 on:
   workflow_dispatch:
