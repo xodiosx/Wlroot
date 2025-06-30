@@ -10,18 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Clone termux-packages
+    - name: Clone your termux-packages fork
       uses: actions/checkout@v4
       with:
-        repository: termux/termux-packages
+        repository: xodiosx/termux-packages
         path: termux-packages
 
-    - name: Clone wlroots into x11-packages
+    - name: Create build.sh for wlroots-termux
       run: |
         mkdir -p termux-packages/x11-packages/wlroots-termux
         cd termux-packages/x11-packages/wlroots-termux
+
         curl -LO https://github.com/xodiosx/wlroots/archive/refs/heads/wlroots-display-client.tar.gz
         SHA256=$(sha256sum wlroots-display-client.tar.gz | cut -d' ' -f1)
+
         cat > build.sh <<EOF
         TERMUX_PKG_HOMEPAGE=https://gitlab.freedesktop.org/wlroots/wlroots
         TERMUX_PKG_DESCRIPTION="Modular Wayland compositor library"
@@ -52,7 +54,7 @@ jobs:
         unzip android-ndk-r27c-linux.zip -d $HOME
         echo "NDK=$HOME/android-ndk-r27c" >> $GITHUB_ENV
 
-    - name: Install dependencies
+    - name: Install build dependencies
       run: |
         sudo apt update
         sudo apt install -y git wget unzip build-essential clang \
@@ -60,17 +62,17 @@ jobs:
           cmake libdrm-dev libxkbcommon-dev libpixman-1-dev \
           python3 python3-pip python3-setuptools curl
 
-    - name: Setup Termux build env
-      working-directory: termux-packages
-      run: ./scripts/setup-android-cross-env.sh
-
-    - name: Build wlroots .deb
+    - name: Build wlroots package
       working-directory: termux-packages
       run: |
-        source ./scripts/properties.sh
-        ./build-package.sh -a aarch64 wlroots-termux
+        export NDK=$HOME/android-ndk-r27c
+        export TERMUX_SCRIPTDIR=$(pwd)
+        export TERMUX_ARCH=aarch64
+        export TERMUX_PREFIX=/data/data/com.termux/files/usr
+        export TERMUX_PKG_API_LEVEL=26
+        ./build-package.sh -a aarch64 x11-packages/wlroots-termux
 
-    - name: Upload DEB
+    - name: Upload .deb package
       uses: actions/upload-artifact@v4
       with:
         name: wlroots-termux-deb
