@@ -48,6 +48,16 @@ jobs:
         }
         EOF
 
+    - name: Prepare fake Termux paths
+      run: |
+       sudo mkdir -p /data/data/com.termux/files/usr
+        echo "aarch64" | sudo tee /data/TERMUX_ARCH
+        echo "export TERMUX_PREFIX=/data/data/com.termux/files/usr" >> $GITHUB_ENV
+        echo "export TERMUX_ARCH=aarch64" >> $GITHUB_ENV
+        echo "export TERMUX_APP_PACKAGE=com.termux" >> $GITHUB_ENV
+
+
+   
     - name: Install Android NDK
       run: |
         wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
